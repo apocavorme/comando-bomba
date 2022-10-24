@@ -1,8 +1,8 @@
 Bomba dagua:
     site:
         X botao para desligar e ligar bomba
-        T mostrar o nível da caixa dagua
-        T mostrar o nível da bateria da caixa dagua
+        X mostrar o nível da caixa dagua
+        X mostrar o nível da bateria da caixa dagua
     
     client:
         casa:

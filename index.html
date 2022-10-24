@@ -43,13 +43,8 @@
                 var xhttp = new XMLHttpRequest();
 
                 xhttp.onreadystatechange = function() {
-                    console.log("nivel bateria status code: " + this.status);
                     if (this.readyState == 4 && this.status == 200) {
-                        document.getElementById("nivelbateria").innerHTML = "Nível da bateria: " + this.responseText;
-                        console.log("body: " + this.response.body);
-                    } else {
-                        document.getElementById("errors").innerHTML = "Ocorreu um erro interno do servidor ao solicitar os dados.";
-                        console.log("body: " + this.response.body);
+                        document.getElementById("nivelbateria").innerHTML = "Nível da bateria: " + this.responseText + "%";
                     }
                 };
 
@@ -61,13 +56,8 @@
                 var xhttp = new XMLHttpRequest();
 
                 xhttp.onreadystatechange = function() {
-                    console.log("nivel caixa dagua status code: " + this.status);
                     if (this.readyState == 4 && this.status == 200) {
-                        document.getElementById("nivelcaixadagua").innerHTML = "Nível da caixa Dagua: " + this.responseText;
-                        console.log("body: " + this.response.body);
-                    } else {
-                        document.getElementById("errors").innerHTML = "Ocorreu um erro interno do servidor ao solicitar os dados.";
-                        console.log("body: " + this.response.body);
+                        document.getElementById("nivelcaixadagua").innerHTML = "Nível da caixa Dagua: " + this.responseText + "%";
                     }
                 };
 
