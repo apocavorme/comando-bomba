@@ -86,7 +86,7 @@ const char index_html[] PROGMEM = R"rawliteral(
                 var xhttp = new XMLHttpRequest();
 
                 xhttp.onreadystatechange = function() {
-                    Console.log("nivel bateria status code: " + this.status);
+                    console.log("nivel bateria status code: " + this.status);
                     if (this.readyState == 4 && this.status == 200) {
                         document.getElementById("nivelbateria").innerHTML = "Nível da bateria: " + this.response.body;
                     } else {
@@ -102,7 +102,7 @@ const char index_html[] PROGMEM = R"rawliteral(
                 var xhttp = new XMLHttpRequest();
 
                 xhttp.onreadystatechange = function() {
-                    Console.log("nivel caixa dagua status code: " + this.status);
+                    console.log("nivel caixa dagua status code: " + this.status);
                     if (this.readyState == 4 && this.status == 200) {
                         document.getElementById("nivelcaixadagua").innerHTML = "Nível da caixa Dagua: " + this.response.body;
                     } else {
