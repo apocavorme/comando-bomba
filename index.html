@@ -20,8 +20,8 @@
         <h2>Controle da bomba dagua</h2>
         %BUTTONPLACEHOLDER%
 
-        <p>Nível da bateria:</p>
-        <p>Nível da caixa Dagua:</p>
+        <p id="nivelbateria">Nível da bateria:</p>
+        <p id="nivelcaixadagua">Nível da caixa Dagua:</p>
         
         <script>
             function toggleCheckbox(element) {
@@ -35,6 +35,32 @@
                 }
                 xhr.send();
             }
+
+            setInterval(function () {
+                var xhttp = new XMLHttpRequest();
+
+                xhttp.onreadystatechange = function() {
+                    if (this.readyState == 4 && this.status == 200) {
+                        document.getElementById("nivelbateria").innerHTML = this.response.body;
+                    }
+                };
+
+                xhttp.open("GET", "http://192.168.1.198:81/nivelbateria", true);
+                xhttp.send();
+            }, 1000 );
+
+            setInterval(function () {
+                var xhttp = new XMLHttpRequest();
+
+                xhttp.onreadystatechange = function() {
+                    if (this.readyState == 4 && this.status == 200) {
+                        document.getElementById("nivelcaixadagua").innerHTML = this.response.body;
+                    }
+                };
+
+                xhttp.open("GET", "http://192.168.1.198:81/nivelcaixadagua", true);
+                xhttp.send();
+            }, 1000 );
 
             setInterval(function () {
                 var xhttp = new XMLHttpRequest();

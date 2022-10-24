@@ -203,10 +203,12 @@ void setup()
   serverA.on("/", HTTP_GET, [](AsyncWebServerRequest *request){
     request->send_P(200, "text/html", index_html, processor);
   });
-  serverA.on("/temperature", HTTP_GET, [](AsyncWebServerRequest *request){
+
+  serverA.on("/nivelbateria", HTTP_GET, [](AsyncWebServerRequest *request){
     request->send_P(200, "text/plain", String(t).c_str());
   });
-  serverA.on("/humidity", HTTP_GET, [](AsyncWebServerRequest *request){
+  
+  serverA.on("/nivelcaixadagua", HTTP_GET, [](AsyncWebServerRequest *request){
     request->send_P(200, "text/plain", String(h).c_str());
   });
 
