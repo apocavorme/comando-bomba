@@ -21,8 +21,8 @@ long distanciaCm = 0;
 float t = 0.0;
 float h = 0.0; //  distancia em cm;
 
-const char* receiverAddressLevel = "http://192.168.1.199:81/waterLevel";
-const char* receiverAddressBattery = "http://192.168.1.199:81/BatteryLevel";
+const char* bombaDaguaAddress = "http://192.168.1.199:81/";
+const char* controleCasaAddress = "http://192.168.1.197:81/";
 
 AsyncWebServer serverA(81);
 IPAddress local_IP(192, 168, 1, 198);
@@ -103,20 +103,6 @@ String processor(const String& var){
   return String();
 }
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 void porTalChama(void)
 { 
 //  serverA.end();
@@ -130,7 +116,6 @@ void porTalChama(void)
 //  delay(5000);
 //  serverA.begin();
 }
-
 
 void meaSureWaterLevel(void)
 {
@@ -180,15 +165,6 @@ void httpGETRequest(const char* serverName)
 }
 
 //-----------------------------------------------------------------------
-
-
-
-
-
-
-
-
-
 void setup()
 {
   Serial.begin(115200);
@@ -223,7 +199,6 @@ void setup()
     Serial.println(WiFi.localIP());
   }
 
-
   // Route for root / web page
   serverA.on("/", HTTP_GET, [](AsyncWebServerRequest *request){
     request->send_P(200, "text/html", index_html, processor);
@@ -240,14 +215,73 @@ void setup()
   
 }
 
-
 void loop() 
 {
   meaSureWaterLevel();
   t = (((analogRead(bateryMeASUREpIN)-458)*100)/229);
   Serial.println("bateria");
   Serial.println(t);
-  httpGETRequest(receiverAddressLevel);
-  httpGETRequest(receiverAddressBattery);
+  
+  httpPOSTRequest(bombaDaguaAddress + "caixadagua?nivelBateria=4.56&nivelCaixaDagua=6.66");
+
   ESP.deepSleep(300e6);
+}
+
+String httpPOSTRequest(const char *serverName)
+{
+	WiFiClient client;
+	HTTPClient http;
+
+	// Your IP address with path or Domain name with URL path
+	http.begin(client, serverName);
+
+	// Send HTTP POST request
+	int httpResponseCode = http.POST();
+
+	String payload = "";
+
+	if (httpResponseCode > 0)
+	{
+		Serial.print("HTTP Response code: ");
+		Serial.println(httpResponseCode);
+		payload = http.getString();
+	}
+	else
+	{
+		Serial.print("Error code: ");
+		Serial.println(httpResponseCode);
+	}
+	// Free resources
+	http.end();
+
+	return payload;
+}
+
+String httpGETRequest(const char *serverName)
+{
+	WiFiClient client;
+	HTTPClient http;
+
+	// Your IP address with path or Domain name with URL path
+	http.begin(client, serverName);
+
+	// Send HTTP POST request
+	int httpResponseCode = http.GET();
+
+	String payload = "--";
+
+	if (httpResponseCode > 0)
+	{
+		Serial.print("HTTP Response code: ");
+		Serial.println(httpResponseCode);
+		payload = http.getString();
+	}
+	else
+	{
+		Serial.print("Error code: ");
+		Serial.println(httpResponseCode);
+	}
+	// Free resources
+	http.end();
+	return payload;
 }
