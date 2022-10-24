@@ -223,11 +223,11 @@ void loop()
   Serial.println(t);
   
   String address = "";
-  address.append(bombaDaguaAddress);
-  address.append("caixadagua?nivelBateria=");
-  address.append(String(t));
-  address.append("&nivelCaixaDagua=");
-  address.append(String(h));
+  address.concat(bombaDaguaAddress);
+  address.concat("caixadagua?nivelBateria=");
+  address.concat(String(t));
+  address.concat("&nivelCaixaDagua=");
+  address.concat(String(h));
 
   Serial.println(address);
 
