@@ -210,7 +210,7 @@ void setup()
 	});
 
 	// Send a  request to <ESP_IP>/caixadagua?nivelBateria=x&nivelCaixaDagua=y
-	serverA.on("/caixadagua", HTTP_POST, [](AsyncWebServerRequest *request)
+	serverA.on("/caixadagua", HTTP_GET, [](AsyncWebServerRequest *request)
 	{
 		String bateria;
 		String caixaDagua;
