@@ -225,9 +225,9 @@ void loop()
   char* address = "";
   strcat(address, bombaDaguaAddress);
   strcat(address, "caixadagua?nivelBateria=");
-  strcat(address, t.toString());
+  strcat(address, String(t));
   strcat(address, "&nivelCaixaDagua=");
-  strcat(address, h.toString());
+  strcat(address, String(h));
 
   Serial.println(address);
 
