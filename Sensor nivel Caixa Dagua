@@ -21,7 +21,7 @@ long distanciaCm = 0;
 float t = 0.0;
 float h = 0.0; //  distancia em cm;
 
-const char* bombaDaguaAddress = "http://192.168.1.199:81/";
+const String bombaDaguaAddress = "http://192.168.1.199:81/";
 const char* controleCasaAddress = "http://192.168.1.197:81/";
 
 AsyncWebServer serverA(81);
@@ -138,13 +138,13 @@ void meaSureWaterLevel(void)
 
 //-----------------------------------------------------------------------
 
-void httpGETRequest(const char* serverName) 
+void httpGETRequest(String serverName) 
 {
   WiFiClient client;
   HTTPClient http;
     
   // Your IP address with path or Domain name with URL path 
-  http.begin(client, serverName);
+  http.begin(client, serverName.c_str());
   
   // Send HTTP POST request
   int httpResponseCode = http.GET();
@@ -222,12 +222,12 @@ void loop()
   Serial.println("bateria");
   Serial.println(t);
   
-  char* address = "";
-  strcat(address, bombaDaguaAddress);
-  strcat(address, "caixadagua?nivelBateria=");
-  strcat(address, String(t));
-  strcat(address, "&nivelCaixaDagua=");
-  strcat(address, String(h));
+  String address = "";
+  address.append(bombaDaguaAddress);
+  address.append("caixadagua?nivelBateria=");
+  address.append(String(t));
+  address.append("&nivelCaixaDagua=");
+  address.append(String(h));
 
   Serial.println(address);
 

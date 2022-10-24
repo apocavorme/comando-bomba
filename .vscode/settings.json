@@ -1,5 +1,6 @@
 {
     "files.associations": {
-        "bomba dagua - receiver": "cpp"
+        "bomba dagua - receiver": "cpp",
+        "sensor nivel caixa dagua": "cpp"
     }
 }
