@@ -207,7 +207,7 @@ void setup()
   serverA.on("/nivelbateria", HTTP_GET, [](AsyncWebServerRequest *request){
     request->send_P(200, "text/plain", String(t).c_str());
   });
-  
+
   serverA.on("/nivelcaixadagua", HTTP_GET, [](AsyncWebServerRequest *request){
     request->send_P(200, "text/plain", String(h).c_str());
   });
@@ -230,8 +230,6 @@ void loop()
   address.concat(String(t));
   address.concat("&nivelCaixaDagua=");
   address.concat(String(h));
-
-  Serial.println(address);
 
   httpGETRequest(address);
 

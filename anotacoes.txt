@@ -1,8 +1,8 @@
 Bomba dagua:
     site:
         X botao para desligar e ligar bomba
-        - mostrar o nível da caixa dagua
-        - mostrar o nível da bateria da caixa dagua
+        T mostrar o nível da caixa dagua
+        T mostrar o nível da bateria da caixa dagua
     
     client:
         casa:
@@ -10,8 +10,8 @@ Bomba dagua:
 
     server:
         X recebe comando de ligar e desligar do controle da casa
-        T recebe o nível da caixa dagua
-        T recebe o nível da bateria
+        X recebe o nível da caixa dagua
+        X recebe o nível da bateria
 
 Controle da casa:
     client:
@@ -23,5 +23,5 @@ Controle da casa:
 
 Caixa Dagua:
     client:
-        - envia o nivel da caixa dagua para Controle da Casa e para Bomba Dagua
-        - envia o nivel da bateria para a Bomba Dagua
+        X envia o nivel da caixa dagua para Controle da Casa e para Bomba Dagua
+        X envia o nivel da bateria para a Bomba Dagua

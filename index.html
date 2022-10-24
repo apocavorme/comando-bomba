@@ -43,29 +43,33 @@
                 var xhttp = new XMLHttpRequest();
 
                 xhttp.onreadystatechange = function() {
+                    Console.log("nivel bateria status code: " + this.status);
                     if (this.readyState == 4 && this.status == 200) {
                         document.getElementById("nivelbateria").innerHTML = "Nível da bateria: " + this.response.body;
+                    } else {
+                        document.getElementById("errors").innerHTML = "Ocorreu um erro interno do servidor ao solicitar os dados.";
                     }
                 };
 
                 xhttp.open("GET", "/nivelbateria", true);
                 xhttp.send();
-            }, 1000 );
+            }, 1500);
 
             setInterval(function () {
                 var xhttp = new XMLHttpRequest();
 
                 xhttp.onreadystatechange = function() {
+                    Console.log("nivel caixa dagua status code: " + this.status);
                     if (this.readyState == 4 && this.status == 200) {
                         document.getElementById("nivelcaixadagua").innerHTML = "Nível da caixa Dagua: " + this.response.body;
                     } else {
-                        document.getElementById("errors").innerHTML = "Ocorreu um erro de comunicação com o sensor da caixa";
+                        document.getElementById("errors").innerHTML = "Ocorreu um erro interno do servidor ao solicitar os dados.";
                     }
                 };
 
                 xhttp.open("GET", "/nivelcaixadagua", true);
                 xhttp.send();
-            }, 1000 );
+            }, 1200);
 
             setInterval(function () {
                 var xhttp = new XMLHttpRequest();
@@ -91,7 +95,7 @@
 
                 xhttp.open("GET", "/state", true);
                 xhttp.send();
-            }, 1000 );
+            }, 1000);
         </script>
     </body>
 </html>
