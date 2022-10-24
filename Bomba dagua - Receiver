@@ -137,6 +137,15 @@ const char index_html[] PROGMEM = R"rawliteral(
 
 #pragma endregion
 
+String processor(const String &var);
+String outputState();
+int deTectButt(int pinO);
+int tRocaEstadoBin(int arq);
+void ChckConnecT(int pin0);
+void porTalChama(void);
+void SendRequestToSender();
+String httpGETRequest(const char *serverName);
+
 void loop()
 {
 	ChckConnecT(pinoLedConex);
