@@ -19,6 +19,10 @@
     <body>
         <h2>Controle da bomba dagua</h2>
         %BUTTONPLACEHOLDER%
+
+        <p>Nível da bateria:</p>
+        <p>Nível da caixa Dagua:</p>
+        
         <script>
             function toggleCheckbox(element) {
                 var xhr = new XMLHttpRequest();
@@ -56,7 +60,7 @@
 
                 xhttp.open("GET", "/state", true);
                 xhttp.send();
-            }, 1000 ) ;
+            }, 1000 );
         </script>
     </body>
 </html>

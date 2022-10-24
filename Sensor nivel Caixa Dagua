@@ -222,7 +222,14 @@ void loop()
   Serial.println("bateria");
   Serial.println(t);
   
-  const char* address = "http://192.168.1.199:81/caixadagua?nivelBateria=4.56&nivelCaixaDagua=6.66";
+  char* address = "";
+  strcat(address, bombaDaguaAddress);
+  strcat(address, "caixadagua?nivelBateria=");
+  strcat(address, t.toString());
+  strcat(address, "&nivelCaixaDagua=");
+  strcat(address, h.toString());
+
+  Serial.println(address);
 
   httpGETRequest(address);
 
