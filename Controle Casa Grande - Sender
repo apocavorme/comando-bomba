@@ -1,0 +1,385 @@
+// low acende o led e o relé
+// high desliga
+// porta 80
+// http://192.168.1.199:81/update?state=1 GET (desliga)
+// http://192.168.1.199:81/update?state=0 GET (liga)
+
+
+
+#include <ESP8266WiFi.h>
+#include <ESPAsyncTCP.h>
+#include <ESPAsyncWebServer.h>
+#include <ESP8266HTTPClient.h>
+#include <ESPAsyncWiFiManager.h> 
+#include "ESP8266HTTPClient.h"
+
+const char* PARAM_INPUT_1 = "state";
+
+const int output = 2;     // 12 - Sinaleiro Verde
+const int output2 = 13;   // 13 - Sinaleiro Vermelho
+const int buttonPin = 0;  // 4 e 5
+
+int pinoLedConex = 5;     // 2 (led do esp)
+int estadoConex = 1;
+
+int ledState = HIGH;
+int SwOld = 1;   
+unsigned long lastbouncetim = 0;
+
+
+const char* receiverAddress = "http://192.168.1.199:81/changeState"
+
+// Create AsyncWebServer object on port 80
+AsyncWebServer serverA(81);
+IPAddress local_IP(192, 168, 1, 197);
+IPAddress gateway(192, 168, 1, 1);
+IPAddress subnet(255, 255, 255, 0);
+// IPAddress primaryDNS(8, 8, 8, 8);   //optional
+// IPAddress secondaryDNS(8, 8, 4, 4); //optional
+
+
+const char index_html[] PROGMEM = R"rawliteral(
+<!DOCTYPE HTML><html>
+<head>
+  <title>Controle da Bomba Dagua</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <style>
+    html {font-family: Arial; display: inline-block; text-align: center;}
+    h2 {font-size: 3.0rem;}
+    p {font-size: 3.0rem;}
+    body {max-width: 600px; margin:0px auto; padding-bottom: 25px;}
+    .switch {position: relative; display: inline-block; width: 120px; height: 68px} 
+    .switch input {display: none}
+    .slider {position: absolute; top: 0; left: 0; right: 0; bottom: 0; background-color: #ccc; border-radius: 34px}
+    .slider:before {position: absolute; content: ""; height: 52px; width: 52px; left: 8px; bottom: 8px; background-color: #fff; -webkit-transition: .4s; transition: .4s; border-radius: 68px}
+    input:checked+.slider {background-color: #2196F3}
+    input:checked+.slider:before {-webkit-transform: translateX(52px); -ms-transform: translateX(52px); transform: translateX(52px)}
+  </style>
+</head>
+<body>
+  <h2>Controle da bomba dagua</h2>
+  %BUTTONPLACEHOLDER%
+<script>function toggleCheckbox(element) {
+  var xhr = new XMLHttpRequest();
+  if(element.checked){ xhr.open("GET", "/update?state=0", true); }
+  else { xhr.open("GET", "/update?state=1", true); }
+  xhr.send();
+}
+
+setInterval(function ( ) {
+  var xhttp = new XMLHttpRequest();
+  xhttp.onreadystatechange = function() {
+    if (this.readyState == 4 && this.status == 200) {
+      var inputChecked;
+      var outputStateM;
+      if( this.responseText == 0){ 
+        inputChecked = true;
+        outputStateM = "On";
+      }
+      else { 
+        inputChecked = false;
+        outputStateM = "Off";
+      }
+      document.getElementById("output").checked = inputChecked;
+      document.getElementById("outputState").innerHTML = outputStateM;
+    }
+  };
+  xhttp.open("GET", "/state", true);
+  xhttp.send();
+}, 1000 ) ;
+</script>
+</body>
+</html>
+)rawliteral";
+
+// Replaces placeholder with button section in your web page
+String processor(const String& var){
+  //Serial.println(var);
+  if(var == "BUTTONPLACEHOLDER"){
+    String buttons ="";
+    String outputStateValue = outputState();
+    buttons+= "<h4> <span id=\"outputState\"></span></h4><label class=\"switch\"><input type=\"checkbox\" onchange=\"toggleCheckbox(this)\" id=\"output\" " + outputStateValue + "><span class=\"slider\"></span></label>";
+    return buttons;
+  }
+  return String();
+}
+
+String outputState(){
+  if(digitalRead(output)){
+    return "checked";
+  }
+  else {
+    return "";
+  }
+  return "";
+}
+
+void setup()
+{
+  Serial.begin(115200);
+  pinMode(output, OUTPUT);
+  pinMode(output2, OUTPUT);
+  pinMode(pinoLedConex, OUTPUT);
+  digitalWrite(pinoLedConex, HIGH);
+  digitalWrite(output, HIGH);
+  digitalWrite(output2, HIGH);
+  pinMode(buttonPin, INPUT_PULLUP);
+
+porTalChama();
+
+  if (!WiFi.config(local_IP, gateway, subnet)) 
+  {
+    Serial.println("STA Failed to configure");
+  }
+  
+//------------------------------------------------------------
+//  Serial.print("Connecting to ");
+//  Serial.println(ssid);
+//  WiFi.begin(ssid, password);
+  int counta = 0;
+  while ( WiFi.status() != WL_CONNECTED && counta <= 20 ) 
+  {
+    delay(300);
+    Serial.print(".");
+    counta++;
+  }
+  if ( WiFi.status() != WL_CONNECTED )
+  {
+    Serial.println("");
+    Serial.println("Failed to connect, initializing without WIFI");
+  }
+  else
+  {
+    estadoConex = 0;
+    digitalWrite(pinoLedConex, LOW);
+    Serial.println("");
+    Serial.println("WiFi connected.");
+    Serial.println("IP address: ");
+    Serial.println(WiFi.localIP());
+  }
+
+  // Route for root / web page
+  serverA.on("/", HTTP_GET, [](AsyncWebServerRequest *request){
+    request->send_P(200, "text/html", index_html, processor);
+  });
+
+  // Send a GET request to <ESP_IP>/update?state=<inputMessage>
+  serverA.on("/update", HTTP_GET, [] (AsyncWebServerRequest *request) {
+    String inputMessage;
+    String inputParam;
+    // GET input1 value on <ESP_IP>/update?state=<inputMessage>
+    if (request->hasParam(PARAM_INPUT_1)) {
+      inputMessage = request->getParam(PARAM_INPUT_1)->value();
+      inputParam = PARAM_INPUT_1;
+
+      digitalWrite(output, inputMessage.toInt());
+     
+      ledState = !ledState;
+
+      if(inputMessage == "1")
+        request->redirect("http://192.168.1.199:81/update?state=1");
+      else
+        request->redirect("http://192.168.1.199:81/update?state=0");
+    }
+    else {
+      inputMessage = "No message sent";
+      inputParam = "none";
+    }
+    Serial.println(inputMessage);
+    request->send(200, "text/plain", "OK");
+  });
+
+  // Send a GET request to <ESP_IP>/state
+  serverA.on("/state", HTTP_GET, [] (AsyncWebServerRequest *request) {
+    request->send(200, "text/plain", String(digitalRead(output)).c_str());
+  });
+
+   serverA.on("/changeState", HTTP_GET, [] (AsyncWebServerRequest *request) {
+    ledState = tRocaEstadoBin(ledState);
+    request->send(200, "text/plain", String(ledState).c_str());
+  });
+  
+  // Start server
+  serverA.begin();
+  
+}
+  
+void loop() 
+{
+  ChckConnecT( pinoLedConex );
+  
+  switch ( deTectButt(buttonPin) )
+  {
+    case 0:
+      Serial.println("botao pressionado");
+      SendRequestToReceiver();
+      break;
+    case 1:
+      Serial.println("botao pressionado por 5 segundos");
+        porTalChama();
+      //ESP.restart();
+      break;
+    case 2:
+      Serial.println("botao pressionado por 10 segundos");
+      break;
+  }
+
+  digitalWrite(output, ledState);
+}
+
+
+
+
+
+//------------------------------------------------------------------------------------------------------
+//              Função que detecta o botao, 0s retorna 0, 5s retorna 1 e 10s retorna 2
+//------------------------------------------------------------------------------------------------------
+
+int deTectButt(int pinO)
+{
+  int buttonReleased = 1;
+  int SW_New = digitalRead(pinO);
+  
+  if(SW_New != SwOld)
+  {
+    if(SW_New == 0)
+    {
+      lastbouncetim = millis();  
+    }
+    else if (SW_New != 0)
+    {
+      buttonReleased = 0; // 0 ativa
+    }
+  }  
+  SwOld = SW_New;
+
+
+  long bTime = (millis() - lastbouncetim);
+  if ( buttonReleased == 0 && bTime > 50 )
+  {
+    if ( bTime > 10000 )
+    {
+      return 2;
+    }
+    else if ( bTime > 5000 )
+    {
+        return 1;
+    }
+    else
+    {
+        return 0;
+    } 
+  }
+  return 3;
+}
+
+//------------------------------------------------------------------------------------------------------------------------------
+//                    FUNÇÃO 17 - Troca o Estado Binario Trocado da Variavel passada como Argumento
+//------------------------------------------------------------------------------------------------------------------------------
+//
+//                      Parametros:
+//
+//                          - int arq                        variavel que queremos trocar o estado binario
+//
+//                      Exemplo de chamada da funcao:      variavelBinaria_INT = tRocaEstadoBin(variavelBinaria_INT);
+//------------------------------------------------------------------------------------------------------------------------------
+
+int tRocaEstadoBin(int arq)
+{ 
+  if (arq)
+  {
+    return 0;
+  }
+  else if (!arq)
+  {
+    return 1;
+  }
+}
+
+//-----------------------------------------------------------------------
+//     Funcao q verifica conexao e acende um led e avisa via serial
+//
+//                Variaveis Globais: 
+//
+//      int estadoConex = 1;
+//
+//-----------------------------------------------------------------------
+
+void ChckConnecT(int pin0)
+{
+  if ( WiFi.status() != WL_CONNECTED )
+  {
+    if ( estadoConex == 0 )
+    {
+      estadoConex = 1;
+      digitalWrite(pin0, HIGH);
+      Serial.println("Sem conexão WIFI");
+    }
+
+  }
+  else
+  {
+    if ( estadoConex == 1 )
+    {
+      estadoConex = 0;
+      digitalWrite(pin0, LOW);
+      Serial.println("conexão WIFI reestabelecida");
+      Serial.println("IP address: ");
+      Serial.println(WiFi.localIP());
+    }
+  }
+}
+//-----------------------------------------------------------------------
+
+
+void porTalChama(void)
+{ 
+//  serverA.end();
+//  delay(3000);
+  AsyncWebServer server(80);
+  DNSServer dns;
+  AsyncWiFiManager wifiManager(&server,&dns);
+  wifiManager.setConfigPortalTimeout(30);
+  //wifiManager.autoConnect("Comando Bomba Dagua", "fezesanais");
+  wifiManager.startConfigPortal("Comando Bomba Dagua", "fezesanais");
+//  delay(5000);
+//  serverA.begin();
+}
+
+//-----------------------------------------------------------------------
+
+void SendRequestToReceiver() 
+{
+    httpGETRequest(receiverAddress);
+}
+
+//-----------------------------------------------------------------------
+
+void httpGETRequest(const char* serverName) 
+{
+  WiFiClient client;
+  HTTPClient http;
+    
+  // Your IP address with path or Domain name with URL path 
+  http.begin(client, serverName);
+  
+  // Send HTTP POST request
+  int httpResponseCode = http.GET();
+  
+  String payload = "";
+  
+  if (httpResponseCode>0) {
+    Serial.print("HTTP Response code: ");
+    Serial.println(httpResponseCode);
+    payload = http.getString();
+    ledState = atoi(&payload[0]);
+  }
+  else {
+    Serial.print("Error code: ");
+    Serial.println(httpResponseCode);
+  }
+  // Free resources
+  http.end();
+}
+
+//-----------------------------------------------------------------------
