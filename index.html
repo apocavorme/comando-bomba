@@ -2,7 +2,8 @@
 <html>
     <head>
         <title>Bomba Dagua</title>
-        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <meta name="viewport" content="width=device-width, initial-scale=1">      
+        <meta charset="UTF-8">
         <style>
             html {font-family: Arial; display: inline-block; text-align: center;}
             h2 {font-size: 3.0rem;}
@@ -47,7 +48,7 @@
                     }
                 };
 
-                xhttp.open("GET", "http://192.168.1.198:81/nivelbateria", true);
+                xhttp.open("GET", "/nivelbateria", true);
                 xhttp.send();
             }, 1000 );
 
@@ -62,7 +63,7 @@
                     }
                 };
 
-                xhttp.open("GET", "http://192.168.1.198:81/nivelcaixadagua", true);
+                xhttp.open("GET", "/nivelcaixadagua", true);
                 xhttp.send();
             }, 1000 );
 

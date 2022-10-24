@@ -46,6 +46,7 @@ const char index_html[] PROGMEM = R"rawliteral(
     <head>
         <title>Bomba Dagua</title>
         <meta name="viewport" content="width=device-width, initial-scale=1">
+		<meta charset="UTF-8">
         <style>
             html {font-family: Arial; display: inline-block; text-align: center;}
             h2 {font-size: 3.0rem;}
@@ -66,6 +67,8 @@ const char index_html[] PROGMEM = R"rawliteral(
         <p id="nivelbateria">Nível da bateria:</p>
         <p id="nivelcaixadagua">Nível da caixa Dagua:</p>
         
+        <p id="errors"></p>
+
         <script>
             function toggleCheckbox(element) {
                 var xhr = new XMLHttpRequest();
@@ -88,7 +91,7 @@ const char index_html[] PROGMEM = R"rawliteral(
                     }
                 };
 
-                xhttp.open("GET", "http://192.168.1.198:81/nivelbateria", true);
+                xhttp.open("GET", "/nivelbateria", true);
                 xhttp.send();
             }, 1000 );
 
@@ -98,10 +101,12 @@ const char index_html[] PROGMEM = R"rawliteral(
                 xhttp.onreadystatechange = function() {
                     if (this.readyState == 4 && this.status == 200) {
                         document.getElementById("nivelcaixadagua").innerHTML = "Nível da caixa Dagua: " + this.response.body;
+                    } else {
+                        document.getElementById("errors").innerHTML = "Ocorreu um erro de comunicação com o sensor da caixa";
                     }
                 };
 
-                xhttp.open("GET", "http://192.168.1.198:81/nivelcaixadagua", true);
+                xhttp.open("GET", "/nivelcaixadagua", true);
                 xhttp.send();
             }, 1000 );
 
@@ -253,6 +258,16 @@ void setup()
 	serverA.on("/state", HTTP_GET, [](AsyncWebServerRequest *request)
 	{ 
 		request->send(200, "text/plain", String(digitalRead(output)).c_str());
+	});
+
+	serverA.on("/nivelbateria", HTTP_GET, [](AsyncWebServerRequest *request)
+	{ 
+		request->send(200, "text/plain", String(nivelBateria).c_str());
+	});
+
+	serverA.on("/nivelcaixadagua", HTTP_GET, [](AsyncWebServerRequest *request)
+	{ 
+		request->send(200, "text/plain", String(nivelCaixaDagua).c_str());
 	});
 
 	serverA.on("/changeState", HTTP_GET, [](AsyncWebServerRequest *request)
