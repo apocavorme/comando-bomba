@@ -41,7 +41,7 @@
 
                 xhttp.onreadystatechange = function() {
                     if (this.readyState == 4 && this.status == 200) {
-                        document.getElementById("nivelbateria").innerHTML = this.response.body;
+                        document.getElementById("nivelbateria").innerHTML = "Nível da bateria: " + this.response.body;
                     }
                 };
 
@@ -54,7 +54,7 @@
 
                 xhttp.onreadystatechange = function() {
                     if (this.readyState == 4 && this.status == 200) {
-                        document.getElementById("nivelcaixadagua").innerHTML = this.response.body;
+                        document.getElementById("nivelcaixadagua").innerHTML = "Nível da caixa Dagua: " + this.response.body;
                     }
                 };
 
