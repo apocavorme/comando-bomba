@@ -12,6 +12,8 @@
 #include "ESP8266HTTPClient.h"
 
 const char *PARAM_INPUT_1 = "state";
+const char *PARAM_INPUT_NIVEL_BATERIA = "nivelBateria";
+const char *PARAM_INPUT_NIVEL_CAIXADAGUA = "nivelCaixaDagua";
 
 const int output = 2;	 // 12 - Sinaleiro Verde
 const int output2 = 13;	 // 13 - Sinaleiro Vermelho
@@ -215,19 +217,21 @@ void setup()
 		String bateria;
 		String caixaDagua;
 
-    	if (request->hasParam(PARAM_INPUT_1)) {
-			bateria = request->getParam(PARAM_INPUT_1)->value();
+    	if (request->hasParam(PARAM_INPUT_NIVEL_BATERIA)) {
+			bateria = request->getParam(PARAM_INPUT_NIVEL_BATERIA)->value();
 		}
 
-		if(request->hasParam(PARAM_INPUT_2)) {
-			caixaDagua = request->getParam(PARAM_INPUT_2)->value();
+		if(request->hasParam(PARAM_INPUT_NIVEL_CAIXADAGUA)) {
+			caixaDagua = request->getParam(PARAM_INPUT_NIVEL_CAIXADAGUA)->value();
 		}
 
 		nivelBateria = bateria.toFloat();
 		nivelCaixaDagua = caixaDagua.toFloat();
 
-		Serial.println("Nível da Bateria:" + nivelBateria);
-		Serial.println("Nível da Caixa Dagua:" + nivelCaixaDagua);
+		Serial.print("Nível da Bateria:");
+		Serial.println(nivelBateria);
+		Serial.print("Nível da Caixa Dagua:");
+		Serial.println(nivelCaixaDagua);
 		
     	request->send(200); 
 	});
