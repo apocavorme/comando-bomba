@@ -26,6 +26,9 @@ int ledState = HIGH;
 int SwOld = 1;   
 unsigned long lastbouncetim = 0;
 
+float nivelCaixaDagua = 0;
+
+const char* PARAM_INPUT_NIVEL_CAIXADAGUA = "nivelCaixaDagua";
 
 const char* receiverAddress = "http://192.168.1.199:81/changeState"
 
@@ -198,6 +201,23 @@ porTalChama();
     ledState = tRocaEstadoBin(ledState);
     request->send(200, "text/plain", String(ledState).c_str());
   });
+
+  // Send a  request to <ESP_IP>/caixadagua?nivelCaixaDagua=y
+	serverA.on("/caixadagua", HTTP_GET, [](AsyncWebServerRequest *request)
+	{
+      String caixaDagua;
+
+      if(request->hasParam(PARAM_INPUT_NIVEL_CAIXADAGUA)) {
+        caixaDagua = request->getParam(PARAM_INPUT_NIVEL_CAIXADAGUA)->value();
+      }
+
+      nivelCaixaDagua = caixaDagua.toFloat();
+
+      Serial.print("Nível da Caixa Dagua:");
+      Serial.println(nivelCaixaDagua);
+      
+    	request->send(200); 
+	});
   
   // Start server
   serverA.begin();

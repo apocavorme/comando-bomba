@@ -19,7 +19,7 @@ Controle da casa:
     
     server:
         - recebe o estado da bomba, enviado pela Bomba Dagua
-        - recebe o nivel da caixa dagua, enviado pela Caixa Dagua
+        T recebe o nivel da caixa dagua, enviado pela Caixa Dagua
 
 Caixa Dagua:
     client:

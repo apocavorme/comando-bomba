@@ -224,14 +224,20 @@ void loop()
   Serial.println("bateria");
   Serial.println(t);
   
-  String address = "";
-  address.concat(bombaDaguaAddress);
-  address.concat("caixadagua?nivelBateria=");
-  address.concat(String(t));
-  address.concat("&nivelCaixaDagua=");
-  address.concat(String(h));
+  String addressToBombaDagua = "";
+  String addressToControleCasa = "";
+  addressToBombaDagua.concat(bombaDaguaAddress);
+  addressToBombaDagua.concat("caixadagua?nivelBateria=");
+  addressToBombaDagua.concat(String(t));
+  addressToBombaDagua.concat("&nivelCaixaDagua=");
+  addressToBombaDagua.concat(String(h));
 
-  httpGETRequest(address);
+  addressToControleCasa.concat(controleCasaAddress);
+  addressToControleCasa.concat("caixadagua?nivelCaixaDagua=");
+  addressToControleCasa.concat(String(h));
+
+  httpGETRequest(addressToBombaDagua);
+  httpGETRequest(addressToControleCasa);
 
   ESP.deepSleep(300e6);
 }
